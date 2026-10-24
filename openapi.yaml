@@ -1,0 +1,254 @@
+openapi: 3.1.0
+info:
+  title: Ariful Assistant API
+  version: 4.3.0
+  description: >
+    Public read-only knowledge and FAQ access. Write operations require a short-lived
+    admin session token returned by login_admin. Never place admin passwords or API
+    keys in this schema or GPT instructions. Chat-based password entry may remain in
+    conversation history; use a separate secure login page for sensitive production use.
+servers:
+  - url: https://script.google.com/macros/s/AKfycbxPcMh43DnDJEEXfmHgMWY9mQagmp__-bK3T2GgpeuLfsQs652vrQJKT9Qik8ENly46yw
+paths:
+  /exec:
+    post:
+      operationId: arifulAssistantAction
+      summary: Run an Ariful Assistant API action
+      description: >
+        Send one JSON action per request. Public actions are health, search, faq,
+        categories and get_by_id. Admin write actions require a valid session_token.
+        Do not ask users to share credentials unless they explicitly initiate admin login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/HealthRequest'
+                - $ref: '#/components/schemas/SearchRequest'
+                - $ref: '#/components/schemas/FaqRequest'
+                - $ref: '#/components/schemas/CategoriesRequest'
+                - $ref: '#/components/schemas/GetByIdRequest'
+                - $ref: '#/components/schemas/LoginRequest'
+                - $ref: '#/components/schemas/LogoutRequest'
+                - $ref: '#/components/schemas/AddKnowledgeRequest'
+                - $ref: '#/components/schemas/UpdateKnowledgeRequest'
+                - $ref: '#/components/schemas/AddFaqRequest'
+      responses:
+        '200':
+          description: JSON result. Check success; errors may also be returned with HTTP 200.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  schemas:
+    BaseRequest:
+      type: object
+      properties:
+        action:
+          type: string
+      required: [action]
+    HealthRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: health
+          required: [action]
+    SearchRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: search
+            query:
+              type: string
+            q:
+              type: string
+            language:
+              type: string
+              default: bn
+            category:
+              type: string
+            limit:
+              type: integer
+              minimum: 1
+              maximum: 50
+            offset:
+              type: integer
+              minimum: 0
+          anyOf:
+            - required: [query]
+            - required: [q]
+          required: [action]
+    FaqRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: faq
+            query:
+              type: string
+            q:
+              type: string
+            language:
+              type: string
+              default: bn
+            limit:
+              type: integer
+            offset:
+              type: integer
+          required: [action]
+    CategoriesRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: categories
+            language:
+              type: string
+              default: bn
+          required: [action]
+    GetByIdRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: get_by_id
+            id:
+              type: string
+            record_id:
+              type: string
+            type:
+              type: string
+              enum: [Knowledge, FAQ, Categories]
+          anyOf:
+            - required: [id]
+            - required: [record_id]
+          required: [action]
+    LoginRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: login_admin
+            username:
+              type: string
+            password:
+              type: string
+              writeOnly: true
+          required: [action, username, password]
+    LogoutRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: logout_admin
+            session_token:
+              type: string
+          required: [action, session_token]
+    AddKnowledgeRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: add_knowledge
+            session_token:
+              type: string
+            Title:
+              type: string
+            Category:
+              type: string
+            Keywords:
+              type: string
+            Question:
+              type: string
+            Answer:
+              type: string
+            Content:
+              type: string
+            Source:
+              type: string
+            Language:
+              type: string
+              default: bn
+            Status:
+              type: string
+              default: Active
+          required: [action, session_token, Title]
+    UpdateKnowledgeRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: update_knowledge
+            session_token:
+              type: string
+            Knowledge_ID:
+              type: string
+            Title:
+              type: string
+            Category:
+              type: string
+            Keywords:
+              type: string
+            Question:
+              type: string
+            Answer:
+              type: string
+            Content:
+              type: string
+            Source:
+              type: string
+            Language:
+              type: string
+            Status:
+              type: string
+          required: [action, session_token, Knowledge_ID]
+    AddFaqRequest:
+      allOf:
+        - $ref: '#/components/schemas/BaseRequest'
+        - type: object
+          properties:
+            action:
+              const: add_faq
+            session_token:
+              type: string
+            Question:
+              type: string
+            Answer:
+              type: string
+            Keywords:
+              type: string
+            Category:
+              type: string
+            Language:
+              type: string
+              default: bn
+            Status:
+              type: string
+              default: Active
+          required: [action, session_token, Question]
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        request_id:
+          type: string
+        data:
+          type: object
+          additionalProperties: true
+        error:
+          type: string
+      additionalProperties: true
