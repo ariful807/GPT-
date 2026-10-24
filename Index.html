@@ -1835,20 +1835,25 @@
             );
           }
 
+          // Preserve the type before closeModal() clears editing state.
+          const savedType = state.editingType;
           closeModal();
 
-          if (state.editingType === "knowledge") loadKnowledge();
-          if (state.editingType === "faq") loadFaq();
-          if (state.editingType === "category") loadCategories();
+          if (savedType === "knowledge") loadKnowledge();
+          if (savedType === "faq") loadFaq();
+          if (savedType === "category") loadCategories();
 
           loadDashboard();
 
           alert("তথ্য সফলভাবে সংরক্ষণ করা হয়েছে।");
 
         } catch (error) {
+          console.error("Record save failed:", error);
+          const detail = error && error.message
+            ? error.message
+            : "অজানা সমস্যা";
           alert(
-            "তথ্য সংরক্ষণ করা যায়নি। " +
-            "Code.gs-এর saveAdminRecord() যাচাই করো।"
+            "তথ্য সংরক্ষণ করা যায়নি।\nকারণ: " + detail
           );
         }
       });
