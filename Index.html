@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Ariful Assistant | Admin Dashboard</title>
+
+  <style>
+    :root {
+      --primary: #315efb;
+      --primary-dark: #2449ce;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --text: #172033;
+      --muted: #758099;
+      --border: #e5eaf2;
+      --success: #16875d;
+      --danger: #d93448;
+      --sidebar: #111a2e;
+      --sidebar-hover: #202d48;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans Bengali", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* LOGIN */
+
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top left, #dbe7ff, transparent 40%),
+        linear-gradient(135deg, #f5f8ff, #e8eefb);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 35px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 18px 60px rgba(28, 49, 93, .12);
+    }
+
+    .brand-icon {
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 17px;
+      background: var(--primary);
+      color: white;
+      font-size: 25px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .login-card h1 {
+      font-size: 25px;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      margin-bottom: 26px;
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: white;
+      color: var(--text);
+    }
+
+    .input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(49, 94, 251, .10);
+    }
+
+    .btn {
+      border: 0;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-light {
+      background: #eef2fa;
+      color: #25324b;
+    }
+
+    .btn-danger {
+      background: #fff0f1;
+      color: var(--danger);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    .message.success {
+      color: var(--success);
+    }
+
+    /* APPLICATION LAYOUT */
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      flex-shrink: 0;
+      background: var(--sidebar);
+      color: white;
+      padding: 22px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 10px 25px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-brand .brand-icon {
+      width: 42px;
+      height: 42px;
+      margin: 0;
+      border-radius: 12px;
+      font-size: 18px;
+    }
+
+    .sidebar-brand strong {
+      font-size: 15px;
+    }
+
+    .sidebar-brand small {
+      display: block;
+      color: #a9b6ce;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .nav-label {
+      color: #8795b0;
+      font-size: 10px;
+      letter-spacing: 1.3px;
+      padding: 8px 12px;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      width: 100%;
+      border: 0;
+      text-align: left;
+      background: transparent;
+      color: #c8d2e5;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 3px 0;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: var(--sidebar-hover);
+      color: white;
+    }
+
+    .nav-icon {
+      width: 22px;
+      text-align: center;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    .main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .topbar {
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      background: #e8edff;
+      color: var(--primary);
+      border-radius: 50%;
+      font-weight: bold;
+    }
+
+    .content {
+      padding: 28px;
+      max-width: 1500px;
+      margin: auto;
+    }
+
+    .welcome {
+      margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+      margin: 0 0 8px;
+      font-size: 25px;
+    }
+
+    .welcome p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* STATISTICS */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    .stat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #edf1ff;
+      font-size: 20px;
+    }
+
+    .stat-number {
+      margin-top: 18px;
+      font-size: 30px;
+      font-weight: 800;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .panel-body {
+      padding: 22px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .toolbar .input {
+      width: auto;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    /* TABLES */
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 14px 15px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8faff;
+      color: #66728a;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    td {
+      line-height: 1.6;
+    }
+
+    tr:hover td {
+      background: #fbfcff;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-active {
+      background: #e4f7ed;
+      color: #137b4e;
+    }
+
+    .badge-inactive {
+      background: #fff0f1;
+      color: #bf293b;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .btn-small {
+      border: 0;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* FORMS */
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    textarea.input {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 22, 42, .5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 1000;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 760px;
+      max-height: 90vh;
+      overflow: auto;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.2);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 18px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .empty {
+      padding: 40px 15px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .notice {
+      padding: 13px 15px;
+      background: #eef4ff;
+      color: #2449a5;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .loading {
+      opacity: .65;
+      pointer-events: none;
+    }
+
+    .mobile-menu {
+      display: none;
+    }
+
+    @media (max-width: 1000px) {
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .sidebar {
+        width: 220px;
+      }
+
+      .content {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        display: block;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -260px;
+        z-index: 500;
+        width: 250px;
+        transition: left .2s;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .mobile-menu {
+        display: inline-block;
+      }
+
+      .topbar {
+        height: 65px;
+        padding: 0 15px;
+      }
+
+      .topbar h2 {
+        font-size: 16px;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .stat-card {
+        padding: 15px;
+      }
+
+      .stat-number {
+        font-size: 24px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid .full {
+        grid-column: auto;
+      }
+
+      .login-card {
+        padding: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN SCREEN -->
+
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-icon">A</div>
+
+      <h1>Ariful Assistant</h1>
+      <div class="subtitle">
+        Admin Dashboard<br>
+        আপনার Knowledge Base পরিচালনা করুন।
+      </div>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            class="input"
+            type="text"
+            autocomplete="username"
+            required
+            maxlength="100"
+            placeholder="আপনার Username লিখুন">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            class="input"
+            type="password"
+            autocomplete="current-password"
+            required
+            maxlength="200"
+            placeholder="আপনার Password লিখুন">
+        </div>
+
+        <button
+          id="loginButton"
+          class="btn btn-primary btn-block"
+          type="submit">
+          নিরাপদে লগইন করুন
+        </button>
+
+        <div id="loginMessage" class="message"></div>
+      </form>
+
+      <p style="font-size:11px;color:#8a94a8;margin-top:25px;">
+        Authorized access only.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- MAIN APPLICATION -->
+
+  <div id="app" class="app hidden">
+
+    <aside id="sidebar" class="sidebar">
+
+      <div class="sidebar-brand">
+        <div class="brand-icon">A</div>
+        <div>
+          <strong>Ariful Assistant</strong>
+          <small>Management Console</small>
+        </div>
+      </div>
+
+      <div class="nav-label">Workspace</div>
+
+      <button class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">▦</span>
+        Dashboard
+      </button>
+
+      <button class="nav-item" data-page="knowledge">
+        <span class="nav-icon">📚</span>
+        Knowledge Base
+      </button>
+
+      <button class="nav-item" data-page="faq">
+        <span class="nav-icon">❓</span>
+        FAQ Management
+      </button>
+
+      <button class="nav-item" data-page="categories">
+        <span class="nav-icon">🗂️</span>
+        Categories
+      </button>
+
+      <button class="nav-item" data-page="logs">
+        <span class="nav-icon">🕒</span>
+        Activity Logs
+      </button>
+
+      <button class="nav-item" data-page="settings">
+        <span class="nav-icon">⚙️</span>
+        System Status
+      </button>
+
+      <div class="sidebar-bottom">
+        <button id="logoutButton" class="nav-item">
+          <span class="nav-icon">↪</span>
+          Logout
+        </button>
+      </div>
+
+    </aside>
+
+
+    <main class="main">
+
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="mobileMenuButton"
+            class="btn btn-light mobile-menu">☰</button>
+          <h2 id="pageTitle">Dashboard</h2>
+        </div>
+
+        <div class="topbar-right">
+          <span id="currentUser">Admin</span>
+          <div class="avatar">A</div>
+        </div>
+      </header>
+
+
+      <div class="content">
+
+        <!-- DASHBOARD -->
+
+        <section id="page-dashboard" class="page">
+
+          <div class="welcome">
+            <h1>স্বাগতম, Admin 👋</h1>
+            <p>
+              এখান থেকে Ariful Assistant-এর Knowledge Base,
+              FAQ এবং Categories পরিচালনা করতে পারবে।
+            </p>
+          </div>
+
+          <div class="stats">
+
+            <div class="stat-card">
+              <div class="stat-top">
+                <span>মোট Knowledge</span>
+                <span class="stat-icon">📚</span>
+              </div>
+              <div id="statKnowledge" class="stat-number">—</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-top">
+                <span>মোট FAQ</span>
+                <span class="stat-icon">❓</span>
+              </div>
+              <div id="statFaq" class="stat-number">—</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-top">
+                <span>Categories</span>
+                <span class="stat-icon">🗂️</span>
+              </div>
+              <div id="statCategories" class="stat-number">—</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-top">
+                <span>Database</span>
+                <span class="stat-icon">🟢</span>
+              </div>
+              <div id="statDatabase" class="stat-number"
+                style="font-size:20px;">Checking</div>
+            </div>
+
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>দ্রুত কাজ</h3>
+            </div>
+
+            <div class="panel-body">
+              <div class="toolbar">
+                <button class="btn btn-primary"
+                  onclick="openKnowledgeModal()">
+                  + নতুন Knowledge
+                </button>
+
+                <button class="btn btn-light"
+                  onclick="openFaqModal()">
+                  + নতুন FAQ
+                </button>
+
+                <button class="btn btn-light"
+                  onclick="loadDashboard()">
+                  ↻ Refresh
+                </button>
+              </div>
+
+              <div class="notice">
+                তথ্য পরিবর্তন করলে তা Google Sheets-এ সংরক্ষিত হবে।
+                পরিবর্তনের আগে সঠিক Spreadsheet ও Permissions যাচাই করো।
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- KNOWLEDGE -->
+
+        <section id="page-knowledge" class="page hidden">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Knowledge Management</h3>
+
+              <button class="btn btn-primary"
+                onclick="openKnowledgeModal()">
+                + Add Knowledge
+              </button>
+            </div>
+
+            <div class="panel-body">
+
+              <div class="toolbar">
+                <input id="knowledgeSearch"
+                  class="input"
+                  placeholder="Title, Question বা Keywords খুঁজুন">
+
+                <select id="knowledgeStatus" class="input">
+                  <option value="">সব Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+
+                <button class="btn btn-light"
+                  onclick="loadKnowledge()">
+                  Search
+                </button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Title</th>
+                      <th>Category</th>
+                      <th>Language</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="knowledgeTable">
+                    <tr>
+                      <td colspan="6" class="empty">
+                        লগইন করে তথ্য লোড করুন।
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pagination">
+                <span id="knowledgeCount">0 records</span>
+
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-light"
+                    onclick="changeKnowledgePage(-1)">
+                    Previous
+                  </button>
+
+                  <button class="btn btn-light"
+                    onclick="changeKnowledgePage(1)">
+                    Next
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+
+        <!-- FAQ -->
+
+        <section id="page-faq" class="page hidden">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>FAQ Management</h3>
+
+              <button class="btn btn-primary"
+                onclick="openFaqModal()">
+                + Add FAQ
+              </button>
+            </div>
+
+            <div class="panel-body">
+
+              <div class="toolbar">
+                <input id="faqSearch"
+                  class="input"
+                  placeholder="প্রশ্ন খুঁজুন">
+
+                <button class="btn btn-light"
+                  onclick="loadFaq()">
+                  Search
+                </button>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>FAQ ID</th>
+                      <th>Question</th>
+                      <th>Answer</th>
+                      <th>Category</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="faqTable">
+                    <tr>
+                      <td colspan="6" class="empty">
+                        কোনো তথ্য লোড করা হয়নি।
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+
+        <!-- CATEGORIES -->
+
+        <section id="page-categories" class="page hidden">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Categories</h3>
+              <button class="btn btn-primary"
+                onclick="openCategoryModal()">
+                + Add Category
+              </button>
+            </div>
+
+            <div class="panel-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="categoryTable">
+                    <tr>
+                      <td colspan="4" class="empty">
+                        Categories লোড করা হয়নি।
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ACTIVITY LOGS -->
+
+        <section id="page-logs" class="page hidden">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Activity Logs</h3>
+
+              <button class="btn btn-light"
+                onclick="loadLogs()">
+                ↻ Refresh
+              </button>
+            </div>
+
+            <div class="panel-body">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>Actor</th>
+                      <th>Action</th>
+                      <th>Status</th>
+                      <th>Request ID</th>
+                    </tr>
+                  </thead>
+
+                  <tbody id="logsTable">
+                    <tr>
+                      <td colspan="5" class="empty">
+                        Logs লোড করা হয়নি।
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- SYSTEM STATUS -->
+
+        <section id="page-settings" class="page hidden">
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>System Status</h3>
+              <button class="btn btn-light"
+                onclick="loadDashboard()">
+                Check Again
+              </button>
+            </div>
+
+            <div class="panel-body">
+              <div class="notice">
+                এই অংশে Database Connection, API Status,
+                Application Version এবং সেটিংস দেখা যাবে।
+              </div>
+
+              <div id="systemStatus">
+                Status পরীক্ষা করা হচ্ছে...
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+
+  <!-- REUSABLE MODAL -->
+
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Record</h3>
+
+        <button class="btn btn-light"
+          onclick="closeModal()">✕</button>
+      </div>
+
+      <form id="recordForm">
+
+        <div id="modalFields" class="modal-body"></div>
+
+        <div class="modal-footer">
+          <button type="button"
+            class="btn btn-light"
+            onclick="closeModal()">
+            Cancel
+          </button>
+
+          <button type="submit"
+            class="btn btn-primary">
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+
+  <script>
+    "use strict";
+
+    /*
+     * SECURITY NOTE
+     *
+     * Authentication must be performed on the server.
+     * Never store admin passwords, admin secrets or API
+     * credentials in this HTML file.
+     *
+     * The following client-side functions are UI hooks.
+     * They require matching server functions in Code.gs.
+     */
+
+    const state = {
+      token: null,
+      username: null,
+      page: "dashboard",
+      knowledgePage: 0,
+      knowledgeLimit: 10,
+      editingRecord: null,
+      editingType: null
+    };
+
+
+    const pageTitles = {
+      dashboard: "Dashboard",
+      knowledge: "Knowledge Management",
+      faq: "FAQ Management",
+      categories: "Categories",
+      logs: "Activity Logs",
+      settings: "System Status"
+    };
+
+
+    function escapeHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+
+    function showMessage(id, text, type) {
+      const element = document.getElementById(id);
+
+      element.textContent = text;
+      element.className = "message " + (type || "");
+    }
+
+
+    function setLoading(button, loading, label) {
+      if (!button) return;
+
+      button.disabled = loading;
+
+      if (loading) {
+        button.dataset.originalText = button.textContent;
+        button.textContent = label || "অপেক্ষা করুন...";
+      } else {
+        button.textContent =
+          button.dataset.originalText || button.textContent;
+      }
+    }
+
+
+    /*
+     * LOGIN
+     *
+     * Calls server-side loginAdmin().
+     * This function must be implemented in Code.gs.
+     */
+    document.getElementById("loginForm")
+      .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const username =
+          document.getElementById("username").value.trim();
+
+        const password =
+          document.getElementById("password").value;
+
+        const button =
+          document.getElementById("loginButton");
+
+        if (!username || !password) {
+          showMessage(
+            "loginMessage",
+            "Username ও Password পূরণ করো।",
+            "error"
+          );
+          return;
+        }
+
+        setLoading(button, true, "যাচাই করা হচ্ছে...");
+
+        try {
+          const response = await callServer(
+            "loginAdmin",
+            username,
+            password
+          );
+
+          if (!response || !response.success) {
+            showMessage(
+              "loginMessage",
+              response && response.message
+                ? response.message
+                : "লগইন করা যায়নি।",
+              "error"
+            );
+            return;
+          }
+
+          state.token = response.token;
+          state.username = response.username || username;
+
+          document.getElementById("currentUser").textContent =
+            state.username;
+
+          document.getElementById("loginScreen")
+            .classList.add("hidden");
+
+          document.getElementById("app")
+            .classList.remove("hidden");
+
+          document.getElementById("password").value = "";
+
+          navigate("dashboard");
+          loadDashboard();
+
+        } catch (error) {
+          showMessage(
+            "loginMessage",
+            "সার্ভারের সঙ্গে যোগাযোগ করা যায়নি। " +
+              "Code.gs-এর loginAdmin() যাচাই করো।",
+            "error"
+          );
+
+        } finally {
+          setLoading(button, false);
+        }
+      });
+
+
+    /*
+     * Google Apps Script server bridge.
+     */
+    function callServer(functionName, ...args) {
+      return new Promise(function(resolve, reject) {
+
+        if (
+          !window.google ||
+          !google.script ||
+          !google.script.run
+        ) {
+          reject(new Error("Apps Script bridge unavailable."));
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)[functionName](...args);
+      });
+    }
+
+
+    /*
+     * LOGOUT
+     *
+     * Requires logoutAdmin(token) in Code.gs.
+     */
+    document.getElementById("logoutButton")
+      .addEventListener("click", async function() {
+
+        try {
+          if (state.token) {
+            await callServer("logoutAdmin", state.token);
+          }
+        } catch (error) {
+          console.error("Logout request failed.");
+        }
+
+        state.token = null;
+        state.username = null;
+
+        document.getElementById("app")
+          .classList.add("hidden");
+
+        document.getElementById("loginScreen")
+          .classList.remove("hidden");
+
+        document.getElementById("loginMessage").textContent = "";
+        document.getElementById("password").value = "";
+      });
+
+
+    /*
+     * NAVIGATION
+     */
+    document.querySelectorAll(".nav-item[data-page]")
+      .forEach(function(button) {
+        button.addEventListener("click", function() {
+          navigate(button.dataset.page);
+        });
+      });
+
+
+    function navigate(page) {
+      if (!pageTitles[page]) return;
+
+      state.page = page;
+
+      document.querySelectorAll(".page")
+        .forEach(function(section) {
+          section.classList.add("hidden");
+        });
+
+      document.getElementById("page-" + page)
+        .classList.remove("hidden");
+
+      document.querySelectorAll(".nav-item[data-page]")
+        .forEach(function(button) {
+          button.classList.toggle(
+            "active",
+            button.dataset.page === page
+          );
+        });
+
+      document.getElementById("pageTitle").textContent =
+        pageTitles[page];
+
+      document.getElementById("sidebar")
+        .classList.remove("open");
+
+      if (page === "knowledge") loadKnowledge();
+      if (page === "faq") loadFaq();
+      if (page === "categories") loadCategories();
+      if (page === "logs") loadLogs();
+      if (page === "settings") loadSystemStatus();
+    }
+
+
+    document.getElementById("mobileMenuButton")
+      .addEventListener("click", function() {
+        document.getElementById("sidebar")
+          .classList.toggle("open");
+      });
+
+
+    /*
+     * DASHBOARD
+     *
+     * Requires getAdminDashboard(token) in Code.gs.
+     */
+    async function loadDashboard() {
+      if (!state.token) return;
+
+      try {
+        const result = await callServer(
+          "getAdminDashboard",
+          state.token
+        );
+
+        if (!result || !result.success) {
+          throw new Error("Dashboard data unavailable.");
+        }
+
+        document.getElementById("statKnowledge").textContent =
+          result.knowledgeCount ?? 0;
+
+        document.getElementById("statFaq").textContent =
+          result.faqCount ?? 0;
+
+        document.getElementById("statCategories").textContent =
+          result.categoryCount ?? 0;
+
+        document.getElementById("statDatabase").textContent =
+          result.databaseStatus || "Connected";
+
+      } catch (error) {
+        document.getElementById("statDatabase").textContent =
+          "Error";
+
+        console.error("Dashboard loading failed.");
+      }
+    }
+
+
+    /*
+     * KNOWLEDGE TABLE
+     *
+     * Requires getAdminKnowledge(token, options).
+     */
+    async function loadKnowledge() {
+      if (!state.token) return;
+
+      const tbody = document.getElementById("knowledgeTable");
+
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="empty">লোড হচ্ছে...</td></tr>';
+
+      const query =
+        document.getElementById("knowledgeSearch").value.trim();
+
+      const status =
+        document.getElementById("knowledgeStatus").value;
+
+      try {
+        const result = await callServer(
+          "getAdminKnowledge",
+          state.token,
+          {
+            query: query,
+            status: status,
+            limit: state.knowledgeLimit,
+            offset: state.knowledgePage * state.knowledgeLimit
+          }
+        );
+
+        if (!result || !result.success) {
+          throw new Error("Knowledge request failed.");
+        }
+
+        const rows = result.results || [];
+
+        if (!rows.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="empty">কোনো তথ্য পাওয়া যায়নি।</td></tr>';
+        } else {
+          tbody.innerHTML = rows.map(function(row) {
+
+            return `
+              <tr>
+                <td>${escapeHtml(row.Knowledge_ID)}</td>
+                <td>
+                  <strong>${escapeHtml(row.Title)}</strong>
+                  <br>
+                  <span style="color:#758099">
+                    ${escapeHtml(row.Question || "")}
+                  </span>
+                </td>
+                <td>${escapeHtml(row.Category)}</td>
+                <td>${escapeHtml(row.Language)}</td>
+                <td>${statusBadge(row.Status)}</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="btn-small btn-light"
+                      onclick="editKnowledge('${escapeJs(row.Knowledge_ID)}')">
+                      Edit
+                    </button>
+                    <button class="btn-small btn-danger"
+                      onclick="archiveKnowledge('${escapeJs(row.Knowledge_ID)}')">
+                      Archive
+                    </button>
+                  </div>
+                </td>
+              </tr>`;
+          }).join("");
+        }
+
+        document.getElementById("knowledgeCount").textContent =
+          (result.total || rows.length) + " records";
+
+      } catch (error) {
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="empty">তথ্য লোড করা যায়নি। Code.gs-এর Admin API যাচাই করো।</td></tr>';
+      }
+    }
+
+
+    function changeKnowledgePage(direction) {
+      state.knowledgePage = Math.max(
+        0,
+        state.knowledgePage + direction
+      );
+
+      loadKnowledge();
+    }
+
+
+    /*
+     * FAQ TABLE
+     */
+    async function loadFaq() {
+      if (!state.token) return;
+
+      const tbody = document.getElementById("faqTable");
+
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="empty">লোড হচ্ছে...</td></tr>';
+
+      try {
+        const result = await callServer(
+          "getAdminFaq",
+          state.token,
+          {
+            query:
+              document.getElementById("faqSearch").value.trim()
+          }
+        );
+
+        if (!result || !result.success) {
+          throw new Error("FAQ request failed.");
+        }
+
+        const rows = result.results || [];
+
+        tbody.innerHTML = rows.length
+          ? rows.map(function(row) {
+              return `
+                <tr>
+                  <td>${escapeHtml(row.FAQ_ID)}</td>
+                  <td>${escapeHtml(row.Question)}</td>
+                  <td>${escapeHtml(row.Answer)}</td>
+                  <td>${escapeHtml(row.Category)}</td>
+                  <td>${statusBadge(row.Status)}</td>
+                  <td>
+                    <button class="btn-small btn-light"
+                      onclick="editFaq('${escapeJs(row.FAQ_ID)}')">
+                      Edit
+                    </button>
+                  </td>
+                </tr>`;
+            }).join("")
+          : '<tr><td colspan="6" class="empty">FAQ পাওয়া যায়নি।</td></tr>';
+
+      } catch (error) {
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="empty">FAQ লোড করা যায়নি।</td></tr>';
+      }
+    }
+
+
+    /*
+     * CATEGORY TABLE
+     */
+    async function loadCategories() {
+      if (!state.token) return;
+
+      const tbody = document.getElementById("categoryTable");
+
+      try {
+        const result = await callServer(
+          "getAdminCategories",
+          state.token
+        );
+
+        if (!result || !result.success) {
+          throw new Error("Category request failed.");
+        }
+
+        const rows = result.results || [];
+
+        tbody.innerHTML = rows.length
+          ? rows.map(function(row) {
+              return `
+                <tr>
+                  <td>${escapeHtml(row.Category_ID)}</td>
+                  <td>${escapeHtml(row.Category_Name)}</td>
+                  <td>${escapeHtml(row.Description)}</td>
+                  <td>${statusBadge(row.Status)}</td>
+                </tr>`;
+            }).join("")
+          : '<tr><td colspan="4" class="empty">কোনো Category নেই।</td></tr>';
+
+      } catch (error) {
+        tbody.innerHTML =
+          '<tr><td colspan="4" class="empty">Categories লোড করা যায়নি।</td></tr>';
+      }
+    }
+
+
+    /*
+     * LOG TABLE
+     */
+    async function loadLogs() {
+      if (!state.token) return;
+
+      const tbody = document.getElementById("logsTable");
+
+      try {
+        const result = await callServer(
+          "getAdminLogs",
+          state.token
+        );
+
+        if (!result || !result.success) {
+          throw new Error("Logs request failed.");
+        }
+
+        const rows = result.results || [];
+
+        tbody.innerHTML = rows.length
+          ? rows.map(function(row) {
+              return `
+                <tr>
+                  <td>${escapeHtml(row.Timestamp)}</td>
+                  <td>${escapeHtml(row.Actor)}</td>
+                  <td>${escapeHtml(row.Action)}</td>
+                  <td>${escapeHtml(row.Status)}</td>
+                  <td>${escapeHtml(row.Request_ID)}</td>
+                </tr>`;
+            }).join("")
+          : '<tr><td colspan="5" class="empty">কোনো Log নেই।</td></tr>';
+
+      } catch (error) {
+        tbody.innerHTML =
+          '<tr><td colspan="5" class="empty">Logs লোড করা যায়নি।</td></tr>';
+      }
+    }
+
+
+    /*
+     * SYSTEM STATUS
+     */
+    async function loadSystemStatus() {
+      if (!state.token) return;
+
+      const element = document.getElementById("systemStatus");
+
+      element.textContent = "পরীক্ষা করা হচ্ছে...";
+
+      try {
+        const result = await callServer(
+          "getAdminSystemStatus",
+          state.token
+        );
+
+        element.textContent = JSON.stringify(result, null, 2);
+
+      } catch (error) {
+        element.textContent =
+          "System status পাওয়া যায়নি।";
+      }
+    }
+
+
+    /*
+     * MODAL
+     */
+    function showModal(title, fields, type, record) {
+      state.editingType = type;
+      state.editingRecord = record || null;
+
+      document.getElementById("modalTitle").textContent = title;
+
+      const container = document.getElementById("modalFields");
+
+      container.innerHTML = `
+        <div class="form-grid">
+          ${fields.map(function(field) {
+            const value = record && record[field.name] != null
+              ? record[field.name]
+              : "";
+
+            const escaped = escapeHtml(value);
+
+            if (field.type === "textarea") {
+              return `
+                <div class="field ${field.full ? "full" : ""}">
+                  <label>${escapeHtml(field.label)}</label>
+                  <textarea
+                    class="input"
+                    name="${escapeHtml(field.name)}"
+                    ${field.required ? "required" : ""}
+                    maxlength="${field.maxlength || 20000}"
+                  >${escaped}</textarea>
+                </div>`;
+            }
+
+            return `
+              <div class="field ${field.full ? "full" : ""}">
+                <label>${escapeHtml(field.label)}</label>
+                <input
+                  class="input"
+                  type="${field.type || "text"}"
+                  name="${escapeHtml(field.name)}"
+                  value="${escaped}"
+                  maxlength="${field.maxlength || 1000}"
+                  ${field.required ? "required" : ""}
+                >
+              </div>`;
+          }).join("")}
+        </div>`;
+
+      document.getElementById("modalBackdrop")
+        .classList.remove("hidden");
+    }
+
+
+    function closeModal() {
+      document.getElementById("modalBackdrop")
+        .classList.add("hidden");
+
+      document.getElementById("recordForm").reset();
+
+      state.editingRecord = null;
+      state.editingType = null;
+    }
+
+
+    function openKnowledgeModal() {
+      showModal(
+        "নতুন Knowledge যোগ করুন",
+        knowledgeFields(),
+        "knowledge",
+        null
+      );
+    }
+
+
+    function openFaqModal() {
+      showModal(
+        "নতুন FAQ যোগ করুন",
+        faqFields(),
+        "faq",
+        null
+      );
+    }
+
+
+    function openCategoryModal() {
+      showModal(
+        "নতুন Category",
+        [
+          {name:"Category_Name", label:"Category Name", required:true},
+          {name:"Description", label:"Description", type:"textarea", full:true},
+          {name:"Language", label:"Language"}
+        ],
+        "category",
+        null
+      );
+    }
+
+
+    function knowledgeFields() {
+      return [
+        {name:"Title", label:"Title", required:true},
+        {name:"Category", label:"Category"},
+        {name:"Keywords", label:"Keywords", full:true},
+        {name:"Question", label:"Question", type:"textarea", full:true},
+        {name:"Answer", label:"Answer", type:"textarea", required:true, full:true},
+        {name:"Content", label:"Detailed Content", type:"textarea", full:true},
+        {name:"Source", label:"Source"},
+        {name:"Language", label:"Language (bn/en/all)"},
+        {name:"Status", label:"Status"}
+      ];
+    }
+
+
+    function faqFields() {
+      return [
+        {name:"Question", label:"Question", required:true, full:true},
+        {name:"Answer", label:"Answer", type:"textarea", required:true, full:true},
+        {name:"Keywords", label:"Keywords", full:true},
+        {name:"Category", label:"Category"},
+        {name:"Language", label:"Language"},
+        {name:"Status", label:"Status"}
+      ];
+    }
+
+
+    /*
+     * RECORD FORM SUBMISSION
+     *
+     * Requires saveAdminRecord(token, type, record, id).
+     */
+    document.getElementById("recordForm")
+      .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        if (!state.token) {
+          alert("সেশন শেষ হয়েছে। আবার লগইন করো।");
+          return;
+        }
+
+        const formData = new FormData(event.currentTarget);
+        const record = {};
+
+        formData.forEach(function(value, key) {
+          record[key] = String(value).trim();
+        });
+
+        try {
+          const id = state.editingRecord
+            ? state.editingRecord.Knowledge_ID ||
+              state.editingRecord.FAQ_ID ||
+              state.editingRecord.Category_ID
+            : null;
+
+          const result = await callServer(
+            "saveAdminRecord",
+            state.token,
+            state.editingType,
+            record,
+            id
+          );
+
+          if (!result || !result.success) {
+            throw new Error(
+              result && result.message
+                ? result.message
+                : "Save failed."
+            );
+          }
+
+          closeModal();
+
+          if (state.editingType === "knowledge") loadKnowledge();
+          if (state.editingType === "faq") loadFaq();
+          if (state.editingType === "category") loadCategories();
+
+          loadDashboard();
+
+          alert("তথ্য সফলভাবে সংরক্ষণ করা হয়েছে।");
+
+        } catch (error) {
+          alert(
+            "তথ্য সংরক্ষণ করা যায়নি। " +
+            "Code.gs-এর saveAdminRecord() যাচাই করো।"
+          );
+        }
+      });
+
+
+    /*
+     * EDIT AND ARCHIVE
+     *
+     * Requires matching server-side functions.
+     */
+    async function editKnowledge(id) {
+      try {
+        const result = await callServer(
+          "getAdminRecord",
+          state.token,
+          "knowledge",
+          id
+        );
+
+        if (!result || !result.success || !result.record) {
+          throw new Error("Record not found.");
+        }
+
+        showModal(
+          "Knowledge সম্পাদনা",
+          knowledgeFields(),
+          "knowledge",
+          result.record
+        );
+
+        state.editingRecord = result.record;
+
+      } catch (error) {
+        alert("Knowledge লোড করা যায়নি।");
+      }
+    }
+
+
+    async function editFaq(id) {
+      try {
+        const result = await callServer(
+          "getAdminRecord",
+          state.token,
+          "faq",
+          id
+        );
+
+        if (!result || !result.success || !result.record) {
+          throw new Error("Record not found.");
+        }
+
+        showModal(
+          "FAQ সম্পাদনা",
+          faqFields(),
+          "faq",
+          result.record
+        );
+
+        state.editingRecord = result.record;
+
+      } catch (error) {
+        alert("FAQ লোড করা যায়নি।");
+      }
+    }
+
+
+    async function archiveKnowledge(id) {
+      if (!confirm(
+        "এই Knowledge-টি Inactive করতে চাও? এটি স্থায়ীভাবে মুছে ফেলা হবে না।"
+      )) {
+        return;
+      }
+
+      try {
+        const result = await callServer(
+          "archiveAdminRecord",
+          state.token,
+          "knowledge",
+          id
+        );
+
+        if (!result || !result.success) {
+          throw new Error("Archive failed.");
+        }
+
+        loadKnowledge();
+        loadDashboard();
+
+      } catch (error) {
+        alert("Archive করা যায়নি।");
+      }
+    }
+
+
+    function statusBadge(status) {
+      const active = String(status || "Active").toLowerCase() === "active";
+
+      return `<span class="badge ${
+        active ? "badge-active" : "badge-inactive"
+      }">${
+        active ? "Active" : "Inactive"
+      }</span>`;
+    }
+
+
+    function escapeJs(value) {
+      return String(value || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r")
+        .replace(/</g, "\\x3c")
+        .replace(/>/g, "\\x3e");
+    }
+
+  </script>
+
+</body>
+</html>
