@@ -3,10 +3,11 @@ info:
   title: Ariful Assistant API
   version: 4.3.0
   description: >
-    Public read-only knowledge and FAQ access. Write operations require a short-lived
-    admin session token returned by login_admin. Never place admin passwords or API
-    keys in this schema or GPT instructions. Chat-based password entry may remain in
-    conversation history; use a separate secure login page for sensitive production use.
+    Public read-only knowledge and FAQ access. Read actions do not require an API key.
+    Write operations require a short-lived admin session token returned by login_admin.
+    Never place admin passwords or secret API keys in this schema or GPT instructions.
+    Chat-based password entry can remain in conversation history, so this is not ideal
+    for high-security production use; use a separate secure login page for sensitive data.
 servers:
   - url: https://script.google.com/macros/s/AKfycbxPcMh43DnDJEEXfmHgMWY9mQagmp__-bK3T2GgpeuLfsQs652vrQJKT9Qik8ENly46yw
 paths:
@@ -16,7 +17,7 @@ paths:
       summary: Run an Ariful Assistant API action
       description: >
         Send one JSON action per request. Public actions are health, search, faq,
-        categories and get_by_id. Admin write actions require a valid session_token.
+        categories and get_by_id and require no API key. Admin write actions require a valid session_token.
         Do not ask users to share credentials unless they explicitly initiate admin login.
       requestBody:
         required: true
