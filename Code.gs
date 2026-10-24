@@ -43,6 +43,19 @@ function updateKnowledge_(b){const id=text_(b.Knowledge_ID||b.id,100);if(!id)thr
 function addFaq_(b){const q=text_(b.Question||b.question,2000);if(!q)throw Error('FAQ question is required');const r={FAQ_ID:newId_('FAQ'),Question:q,Answer:text_(b.Answer||b.answer,10000),Keywords:text_(b.Keywords||b.keywords,1000),Category:text_(b.Category||b.category,120),Language:text_(b.Language||b.language||APP.DEFAULT_LANGUAGE,10),Status:text_(b.Status||b.status||'Active',30),Updated_At:new Date()};appendObject_(db_().getSheetByName(APP.SHEETS.FAQ),r);return r;}
 
 // Admin credentials/session management. Password hash is salted; use a long unique password.
+/**
+ * Run this PUBLIC wrapper manually from the Apps Script editor.
+ * It blocks calls from a different active user, then invokes the private initializer.
+ */
+function initializeAdminCredentials(){
+  const activeEmail = String(Session.getActiveUser().getEmail() || '').toLowerCase();
+  const ownerEmail = String(Session.getEffectiveUser().getEmail() || '').toLowerCase();
+  if (!activeEmail || !ownerEmail || activeEmail !== ownerEmail) {
+    throw new Error('For security, run initializeAdminCredentials() directly from the Apps Script editor while signed in as the script owner.');
+  }
+  return initializeAdminCredentials_();
+}
+
 function initializeAdminCredentials_(){const p=PropertiesService.getScriptProperties(),u=p.getProperty('ADMIN_INITIAL_USERNAME'),pw=p.getProperty('ADMIN_INITIAL_PASSWORD');if(!u||!pw)throw Error('Set ADMIN_INITIAL_USERNAME and ADMIN_INITIAL_PASSWORD in Script Properties first');if(pw.length<12)throw Error('Admin password must be at least 12 characters');const salt=Utilities.getUuid()+Utilities.getUuid();p.setProperties({ADMIN_USERNAME:u,ADMIN_PASSWORD_SALT:salt,ADMIN_PASSWORD_HASH:hashPassword_(pw,salt)},true);p.deleteProperty('ADMIN_INITIAL_USERNAME');p.deleteProperty('ADMIN_INITIAL_PASSWORD');return {success:true,message:'Admin credentials initialized'};}
 function hashPassword_(pw,salt){let v=salt+'|'+pw;for(let i=0;i<ADMIN_CONFIG.HASH_ITERATIONS;i++)v=Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,v));return v;}
 function loginAdmin(username,password){const p=PropertiesService.getScriptProperties(),u=p.getProperty('ADMIN_USERNAME'),salt=p.getProperty('ADMIN_PASSWORD_SALT'),hash=p.getProperty('ADMIN_PASSWORD_HASH');if(!u||!salt||!hash)throw Error('Admin credentials are not configured. Run initializeAdminCredentials_() from the editor.');const cache=CacheService.getScriptCache(),key=ADMIN_CONFIG.LOGIN_PREFIX+Utilities.base64EncodeWebSafe(String(username||'').toLowerCase()),attempt=Number(cache.get(key)||0);if(attempt>=ADMIN_CONFIG.MAX_LOGIN_ATTEMPTS)throw Error('Too many login attempts. Try again in 15 minutes.');if(!constantEqual_(String(username||''),u)||!constantEqual_(hashPassword_(String(password||''),salt),hash)){cache.put(key,String(attempt+1),ADMIN_CONFIG.LOGIN_LOCK_SECONDS);audit_('ADMIN','LOGIN','FAILED','Invalid credentials');throw Error('Invalid username or password');}cache.remove(key);const token=Utilities.getUuid()+Utilities.getUuid()+Utilities.getUuid(),session={username:u,createdAt:Date.now(),expiresAt:Date.now()+ADMIN_CONFIG.SESSION_TTL_SECONDS*1000};cache.put(ADMIN_CONFIG.SESSION_PREFIX+token,JSON.stringify(session),ADMIN_CONFIG.SESSION_TTL_SECONDS);audit_(u,'LOGIN','SUCCESS','Admin login');return {success:true,token,username:u,expiresIn:ADMIN_CONFIG.SESSION_TTL_SECONDS};}
