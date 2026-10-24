@@ -1,6 +1,6 @@
 /**
  * ARIFUL ASSISTANT — Google Apps Script + Google Sheets
- * Version 4.2.0
+ * Version 4.3.0
  * Configure Script Properties before use:
  * ADMIN_INITIAL_USERNAME, ADMIN_INITIAL_PASSWORD,
  * ARIFUL_ASSISTANT_API_KEY, ARIFUL_ASSISTANT_ADMIN_KEY.
@@ -8,7 +8,7 @@
  * Do not run token-protected getAdmin* functions directly from editor.
  */
 const APP = Object.freeze({
-  NAME:'Ariful Assistant', VERSION:'4.2.0',
+  NAME:'Ariful Assistant', VERSION:'4.3.0',
   SPREADSHEET_ID:'1iMYHbQzrgefg4McidDEJFH7n0Hlqm19Z1BHz3XtiGa4',
   DEFAULT_LANGUAGE:'bn', DEFAULT_LIMIT:10, MAX_LIMIT:50, MAX_QUERY_LENGTH:500,
   CACHE_SECONDS:120, ENABLE_WRITE_API:true,
@@ -29,7 +29,7 @@ function setupDatabase_(){ensureSchema_();initializeSettings_();audit_('SYSTEM',
 function ensureSchema_(){const ss=db_();Object.keys(APP.SCHEMAS).forEach(n=>{const h=APP.SCHEMAS[n];let sh=ss.getSheetByName(n);if(!sh)sh=ss.insertSheet(n);if(!sh.getLastRow()||!sh.getLastColumn()){sh.getRange(1,1,1,h.length).setValues([h]);sh.setFrozenRows(1);sh.getRange(1,1,1,h.length).setFontWeight('bold');return;}const old=sh.getRange(1,1,1,sh.getLastColumn()).getDisplayValues()[0];const missing=h.filter(x=>old.indexOf(x)<0);if(missing.length)sh.getRange(1,sh.getLastColumn()+1,1,missing.length).setValues([missing]);sh.setFrozenRows(1);});}
 function initializeSettings_(){const sh=db_().getSheetByName(APP.SHEETS.SETTINGS),keys=readRows_(sh).map(r=>String(r.Setting_Key||''));[['APP_NAME',APP.NAME,'Application name'],['APP_VERSION',APP.VERSION,'Application version'],['DEFAULT_LANGUAGE',APP.DEFAULT_LANGUAGE,'Default language'],['PUBLIC_SEARCH_ENABLED','TRUE','Enable public search']].forEach(x=>{if(!keys.includes(x[0]))appendObject_(sh,{Setting_Key:x[0],Setting_Value:x[1],Description:x[2],Updated_At:new Date()});});}
 function doGet(e){if(e&&e.parameter&&String(e.parameter.page||'')==='admin')return HtmlService.createHtmlOutputFromFile('Index').setTitle(APP.NAME+' — Admin Dashboard');return json_({success:true,app:APP.NAME,version:APP.VERSION,status:'running',endpoints:['health','search','faq','categories','get_by_id','add_knowledge','update_knowledge','add_faq']});}
-function doPost(e){const rid=newId_('REQ');try{const b=parseBody_(e),a=text_(b.action,60).toLowerCase();if(!a)throw Error('Missing action');if(a==='health')return json_({success:true,app:APP.NAME,version:APP.VERSION,status:'running',request_id:rid});authorizeApiKey_(b.api_key);let d;switch(a){case'search':d=search_(b);break;case'faq':d=searchFaq_(b);break;case'categories':d=listCategories_(b);break;case'get_by_id':d=getById_(b);break;case'add_knowledge':requireAdminApi_(b.admin_key);d=addKnowledge_(b);break;case'update_knowledge':requireAdminApi_(b.admin_key);d=updateKnowledge_(b);break;case'add_faq':requireAdminApi_(b.admin_key);d=addFaq_(b);break;default:throw Error('Unsupported action');}return json_({success:true,request_id:rid,data:d});}catch(err){audit_('API','REQUEST','FAILED',String(err.message||err),rid);return json_({success:false,error:safeError_(err),request_id:rid});}}
+function doPost(e){const rid=newId_('REQ');try{const b=parseBody_(e),a=text_(b.action,60).toLowerCase();if(!a)throw Error('Missing action');if(a==='health')return json_({success:true,app:APP.NAME,version:APP.VERSION,status:'running',request_id:rid});let d;switch(a){case'login_admin':d=loginAdmin(b.username,b.password);break;case'logout_admin':d=logoutAdmin(b.session_token);break;case'search':case'faq':case'categories':case'get_by_id':authorizeApiKey_(b.api_key);if(a==='search')d=search_(b);else if(a==='faq')d=searchFaq_(b);else if(a==='categories')d=listCategories_(b);else d=getById_(b);break;case'add_knowledge':requireAdminSession_(b.session_token);d=addKnowledge_(b);break;case'update_knowledge':requireAdminSession_(b.session_token);d=updateKnowledge_(b);break;case'add_faq':requireAdminSession_(b.session_token);d=addFaq_(b);break;default:throw Error('Unsupported action');}return json_({success:true,request_id:rid,data:d});}catch(err){audit_('API','REQUEST','FAILED',String(err.message||err),rid);return json_({success:false,error:safeError_(err),request_id:rid});}}
 function authorizeApiKey_(k){const x=PropertiesService.getScriptProperties().getProperty('ARIFUL_ASSISTANT_API_KEY');if(!x)throw Error('API key is not configured');if(!constantEqual_(String(k||''),x))throw Error('Unauthorized API request');}
 function requireAdminApi_(k){if(!APP.ENABLE_WRITE_API)throw Error('Write API is disabled');const x=PropertiesService.getScriptProperties().getProperty('ARIFUL_ASSISTANT_ADMIN_KEY');if(!x)throw Error('Admin API key is not configured');if(!constantEqual_(String(k||''),x))throw Error('Admin API authorization failed');}
 function constantEqual_(a,b){a=String(a||'');b=String(b||'');if(a.length!==b.length)return false;let n=0;for(let i=0;i<a.length;i++)n|=a.charCodeAt(i)^b.charCodeAt(i);return n===0;}
